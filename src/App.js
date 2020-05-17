@@ -1,14 +1,23 @@
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
+import Button from "react-bootstrap/Button";
+import FormControl from "react-bootstrap/FormControl";
+import Spinner from "react-bootstrap/Spinner";
 import { downloadYoutubeVideo } from "./services/youtube";
+import "./App.css";
 
 function App() {
   const [url, setUrl] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const download = () => {
+    setLoading(true);
     downloadYoutubeVideo(url)
       .then((fileObject) => initDownladDialog(fileObject))
       .catch((error) => {
         console.error(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -23,11 +32,29 @@ function App() {
   };
 
   return (
-    <Fragment>
-      <label htmlFor="downloadInput">Introduce youtube URL:</label>
-      <input id="downloadInput" onChange={(e) => setUrl(e.target.value)} />
-      <button onClick={download}>Download video</button>
-    </Fragment>
+    <div className="app-layout">
+      <div>
+        <label htmlFor="downloadInput">Introduce youtube URL:</label>
+        <FormControl
+          id="downloadInput"
+          onChange={(e) => setUrl(e.target.value)}
+        />
+      </div>
+      {loading ? (
+        <Button disabled>
+          <Spinner
+            as="span"
+            animation="border"
+            size="sm"
+            role="status"
+            aria-hidden="true"
+          />
+          Loading...
+        </Button>
+      ) : (
+        <Button onClick={download}>Download video</Button>
+      )}
+    </div>
   );
 }
 
